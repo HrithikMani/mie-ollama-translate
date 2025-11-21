@@ -814,3 +814,12 @@ if (document.readyState === 'loading') {
 socketManager.connect();
 
 console.log('\n🎉 Translation system initialized!');
+console.log('🛠️  Available Commands:');
+console.log('   window.translationSystem.setLanguage("es")   - Switch target language');
+console.log('   window.translationSystem.getTranslations()   - View all translations');
+console.log('   window.translationSystem.getStats()          - View system statistics');
+console.log('   window.translationSystem.getSocketStatus()   - Check backend connection');
+console.log('   window.translationSystem.rescan()            - Manually rescan page');
+console.log('   window.translationSystem.stop()              - Stop observing changes');
+console.log('   window.translationSystem.start()             - Restart system');
+console.log('   window.translationSystem.clearCache()        - Clear translation cache');
