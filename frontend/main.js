@@ -105,7 +105,10 @@ function shouldTranslateText(text) {
     /^[\$€£¥₹][\d,.\s]+$/,                               // Currency
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/,                        // Email
     /^(https?:\/\/|www\.)/i,                             // URLs
-    /^v?\d+\.\d+(\.\d+)?$/i                              // Version numbers
+    /^v?\d+\.\d+(\.\d+)?$/i,                             // Version numbers
+    /^[\d\.,]+\s*(lbs|kg|g|mg|mcg|oz|lb|in|cm|mm|ft|m|km|mmHg|bpm|F|C|K|%|years|y\/o|days|weeks|months|hr|min|sec|mL|L)$/i, // Measurements with units
+    /^\d+\s*\/\s*\d+(\s*[a-zA-Z]+)?$/,                   // Ratios like 120/80 or 120/80 mmHg
+    /^\d+['"]\s*\d+['"]?$/                               // Height like 5'9"
   ];
   
   // Check all patterns
@@ -296,10 +299,100 @@ class ElementProcessor {
 const elementProcessor = new ElementProcessor();
 
 // ========================================
+// WEBSOCKET COMMUNICATION
+// ========================================
+
+class SocketManager {
+  constructor(url = 'ws://localhost:8080') {
+    this.url = url;
+    this.socket = null;
+    this.sendQueue = new Set(); // Store hashes to send
+    this.sentHashes = new Set(); // Track what we've already sent
+    this.isConnected = false;
+    this.reconnectAttempts = 0;
+  }
+
+  connect() {
+    console.log(`🔌 Connecting to translation backend at ${this.url}...`);
+    this.socket = new WebSocket(this.url);
+
+    this.socket.onopen = () => {
+      console.log('✅ Connected to backend');
+      this.isConnected = true;
+      this.reconnectAttempts = 0;
+      this.flushQueue();
+    };
+
+    this.socket.onclose = () => {
+      console.log('❌ Disconnected from backend');
+      this.isConnected = false;
+      this.retryConnection();
+    };
+
+    this.socket.onerror = (error) => {
+      console.error('⚠️ WebSocket error:', error);
+    };
+
+    this.socket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        this.handleMessage(data);
+      } catch (e) {
+        console.error('Error parsing message:', e);
+      }
+    };
+  }
+
+  retryConnection() {
+    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+    console.log(`🔄 Retrying connection in ${delay}ms...`);
+    setTimeout(() => {
+      this.reconnectAttempts++;
+      this.connect();
+    }, delay);
+  }
+
+  queueForTranslation(text, hash) {
+    if (this.sentHashes.has(hash)) return;
+    
+    this.sendQueue.add(JSON.stringify({ text, hash }));
+    this.sentHashes.add(hash);
+    
+    if (this.isConnected) {
+      this.flushQueue();
+    }
+  }
+
+  flushQueue() {
+    if (this.sendQueue.size === 0) return;
+
+    const batch = Array.from(this.sendQueue).map(item => JSON.parse(item));
+    this.sendQueue.clear();
+
+    this.socket.send(JSON.stringify({
+      type: 'translation_request',
+      payload: batch
+    }));
+    
+    console.log(`📤 Sent ${batch.length} items to backend`);
+  }
+
+  handleMessage(data) {
+    console.log('📩 Received from backend:', data);
+    // Future: Apply received translations
+  }
+}
+
+const socketManager = new SocketManager();
+
+// ========================================
 // TRANSLATION APPLICATION
 // ========================================
 
 async function applyTranslation(item) {
+  // Queue for backend translation
+  socketManager.queueForTranslation(item.text, item.hash);
+
   const translatedText = CONFIG.TRANSLATION_PREFIX + item.text;
   
   // Cache the translation
@@ -562,13 +655,68 @@ window.translationSystem = {
     console.log('🔄 Manual rescan triggered...');
     return await scanPage();
   },
+
+  // Get all translations
+  getTranslations() {
+    const tableData = [];
+    for (const [text, hash] of translationCache.hashCache.entries()) {
+      const translation = translationCache.getTranslation(hash) || '(Pending)';
+      tableData.push({
+        'Original Text': text,
+        'Hash': hash,
+        'Translation': translation
+      });
+    }
+
+    if (tableData.length > 0) {
+      console.log('\n📝 Translation Status:');
+      console.table(tableData);
+    } else {
+      console.log('\n📝 No content discovered yet.');
+    }
+    
+    return tableData;
+  },
   
   // Get statistics
   getStats() {
-    return {
+    const stats = {
       cacheSize: translationCache.cache.size,
       hashCacheSize: translationCache.hashCache.size,
       observerActive: mutationHandler.observer !== null
+    };
+
+    // Generate table data
+    const tableData = [];
+    for (const [text, hash] of translationCache.hashCache.entries()) {
+      tableData.push({
+        'Original Text': text,
+        'Hash': hash
+      });
+    }
+
+    console.log('📊 System Statistics:', stats);
+
+    if (tableData.length > 0) {
+      console.log('\n📝 Discovered Content (Ready for Backend):');
+      console.table(tableData);
+    } else {
+      console.log('\n📝 No content discovered yet.');
+    }
+
+    return {
+      summary: stats,
+      details: tableData
+    };
+  },
+
+  // Get socket status
+  getSocketStatus() {
+    return {
+      connected: socketManager.isConnected,
+      queueSize: socketManager.sendQueue.size,
+      sentCount: socketManager.sentHashes.size,
+      url: socketManager.url
     };
   },
   
@@ -644,11 +792,7 @@ if (document.readyState === 'loading') {
   window.translationSystem.start();
 }
 
+// Start WebSocket connection
+socketManager.connect();
+
 console.log('\n🎉 Translation system initialized!');
-console.log('📚 Available commands:');
-console.log('   window.translationSystem.start()    - Start the system');
-console.log('   window.translationSystem.stop()     - Stop mutation observer');
-console.log('   window.translationSystem.rescan()   - Manual rescan');
-console.log('   window.translationSystem.getStats() - Get statistics');
-console.log('   window.translationSystem.clearCache() - Clear cache');
-console.log('   window.translationSystem.applyCustomTranslations([{hash, translatedText}, ...])');

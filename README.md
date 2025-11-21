@@ -25,10 +25,24 @@ Simply include the `main.js` script in your HTML file. If you are using the prov
 ## Project Structure
 
 - `frontend/`: Contains the core client-side translation script (`main.js`).
-- `backend/`: Placeholder for backend services (e.g., Ollama integration).
+- `backend/`: Node.js WebSocket server to receive translation requests.
 - `examples/`: Contains example implementations, such as an EHR dashboard.
 
 ## Usage
+
+### 1. Start the Backend
+Navigate to the `backend` directory and install dependencies:
+```bash
+cd backend
+npm install
+npm start
+```
+The server will start on `ws://localhost:8080`.
+
+### 2. Open the Example
+Open `examples/ehr-dashboard.html` in your browser. The script will automatically connect to the backend and start sending discovered text for translation.
+
+### Public API
 
 The system automatically initializes when the DOM is ready. It will perform an initial scan of the page and start observing for changes.
 
