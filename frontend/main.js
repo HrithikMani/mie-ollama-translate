@@ -312,6 +312,7 @@ class SocketManager {
     this.sentHashes = new Set(); // Track what we've already sent
     this.isConnected = false;
     this.reconnectAttempts = 0;
+    this.pendingNodes = new Map(); // Store nodes waiting for translation
   }
 
   connect() {
@@ -383,9 +384,43 @@ class SocketManager {
     console.log(`📤 Sent ${batch.length} items to backend`);
   }
 
+  registerPending(hash, item) {
+    if (!this.pendingNodes.has(hash)) {
+      this.pendingNodes.set(hash, new Set());
+    }
+    this.pendingNodes.get(hash).add(item);
+  }
+
   handleMessage(data) {
-    console.log('📩 Received from backend:', data);
-    // Future: Apply received translations
+    if (data.type === 'translation_result') {
+      const { hash, translated } = data;
+      
+      // Update cache
+      translationCache.setTranslation(hash, translated);
+      
+      // Update pending nodes
+      if (this.pendingNodes.has(hash)) {
+        const items = this.pendingNodes.get(hash);
+        
+        for (const item of items) {
+          if (item.type === 'text' && item.node) {
+            item.node.textContent = translated;
+          } else if (item.type === 'form' && item.element) {
+            if (item.attribute === 'textContent') {
+              item.element.textContent = translated;
+            } else {
+              item.element.setAttribute(item.attribute, translated);
+            }
+          }
+        }
+        
+        this.pendingNodes.delete(hash);
+      }
+    } else if (data.type === 'ack') {
+      console.log(`📩 Server acknowledged: ${data.message}`);
+    } else {
+      console.log('📩 Received from backend:', data);
+    }
   }
 }
 
@@ -396,21 +431,38 @@ const socketManager = new SocketManager();
 // ========================================
 
 async function applyTranslation(item) {
+  // Check if we already have a final translation in cache
+  if (translationCache.hasTranslation(item.hash)) {
+    const translatedText = translationCache.getTranslation(item.hash);
+    
+    if (item.type === 'text' && item.node) {
+      item.node.textContent = translatedText;
+    } else if (item.type === 'form' && item.element) {
+      if (item.attribute === 'textContent') {
+        item.element.textContent = translatedText;
+      } else {
+        item.element.setAttribute(item.attribute, translatedText);
+      }
+    }
+    return;
+  }
+
   // Queue for backend translation
   socketManager.queueForTranslation(item.text, item.hash);
-
-  const translatedText = CONFIG.TRANSLATION_PREFIX + item.text;
   
-  // Cache the translation
-  translationCache.setTranslation(item.hash, translatedText);
+  // Register for updates
+  socketManager.registerPending(item.hash, item);
+
+  // Apply placeholder while waiting
+  const placeholderText = CONFIG.TRANSLATION_PREFIX + item.text;
   
   if (item.type === 'text' && item.node && item.node.parentElement) {
-    item.node.textContent = translatedText;
+    item.node.textContent = placeholderText;
   } else if (item.type === 'form' && item.element) {
     if (item.attribute === 'textContent') {
-      item.element.textContent = translatedText;
+      item.element.textContent = placeholderText;
     } else {
-      item.element.setAttribute(item.attribute, translatedText);
+      item.element.setAttribute(item.attribute, placeholderText);
     }
   }
 }

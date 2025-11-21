@@ -7,6 +7,10 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "async": "^3.2.6",
+    "axios": "^1.13.2",
+    "cache-manager": "^7.2.5",
+    "dotenv": "^17.2.3",
     "ws": "^8.14.2"
   }
 }

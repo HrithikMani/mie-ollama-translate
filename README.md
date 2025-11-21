@@ -49,30 +49,46 @@ The system automatically initializes when the DOM is ready. It will perform an i
 ### Default Behavior
 Currently, the system simulates translation by prepending `[TRANSLATION] ` to the text. This serves as a placeholder for integrating with a real translation backend (like Ollama).
 
-### Public API
+## System Architecture
 
-You can control the system using the global `window.translationSystem` object:
+The following diagram illustrates the end-to-end translation process:
 
-```javascript
-// Start the translation system (auto-starts by default)
-window.translationSystem.start();
+```mermaid
+sequenceDiagram
+    participant User
+    participant DOM as DOM (Browser)
+    participant MainJS as Frontend (main.js)
+    participant Socket as SocketManager
+    participant Server as Backend (server.js)
+    participant Cache as Backend Cache (Memory)
+    participant AI as BlueHive AI
 
-// Stop the mutation observer (pauses auto-translation)
-window.translationSystem.stop();
-
-// Manually trigger a full page rescan
-window.translationSystem.rescan();
-
-// Get system statistics (cache size, observer status)
-window.translationSystem.getStats();
-
-// Clear the internal translation cache
-window.translationSystem.clearCache();
-
-// Apply specific translations manually
-window.translationSystem.applyCustomTranslations([
-  { hash: "sha256-hash-of-text", translatedText: "Translated Content" }
-]);
+    User->>DOM: Loads Page / Interacts
+    DOM->>MainJS: MutationObserver detects change
+    MainJS->>MainJS: Filter text (Regex)
+    MainJS->>MainJS: Generate Hash (SHA-256)
+    
+    alt Translation in Frontend Session Cache (RAM)
+        MainJS->>DOM: Apply Translation immediately
+    else Not Cached in Frontend
+        MainJS->>DOM: Apply Placeholder [TRANSLATION]
+        MainJS->>Socket: Queue Translation Request
+        Socket->>Server: Send Batch (WebSocket)
+        
+        Server->>Cache: Check Backend Cache
+        alt Cache Hit
+            Cache-->>Server: Return Cached Text
+        else Cache Miss
+            Server->>AI: Request Translation (HTTPS)
+            AI-->>Server: Return Translated Text
+            Server->>Cache: Store in Backend Cache
+        end
+        
+        Server-->>Socket: Send Translation Result
+        Socket->>MainJS: Receive Message
+        MainJS->>DOM: Update Element with Real Text
+        MainJS->>MainJS: Store in Frontend Session Cache
+    end
 ```
 
 ## Configuration
