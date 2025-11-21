@@ -10,8 +10,8 @@ console.log('🔍 Initializing optimized translation system...\n');
 // ========================================
 
 const CONFIG = {
-  TRANSLATION_PREFIX: '[TRANSLATION] ',
-  TARGET_LANGUAGE: 'es', // Default to Spanish
+  TRANSLATION_PREFIX: '\u200B', // Zero-width space (invisible) to mark translated text
+  TARGET_LANGUAGE: 'te(telugu)', // Default to Spanish
   DEBOUNCE_DELAY: 100, // ms to wait before processing mutations
   BATCH_SIZE: 50, // Process mutations in batches
   CACHE_SIZE: 1000, // Maximum cache entries
@@ -395,8 +395,13 @@ class SocketManager {
     if (data.type === 'translation_result') {
       const { hash, translated } = data;
       
-      // Update cache
-      translationCache.setTranslation(hash, translated);
+      // Ensure the translation has the prefix so it's ignored by the observer
+      const finalTranslation = translated.startsWith(CONFIG.TRANSLATION_PREFIX) 
+        ? translated 
+        : CONFIG.TRANSLATION_PREFIX + translated;
+
+      // Update cache with the prefixed version
+      translationCache.setTranslation(hash, finalTranslation);
       
       // Update pending nodes
       if (this.pendingNodes.has(hash)) {
@@ -404,12 +409,12 @@ class SocketManager {
         
         for (const item of items) {
           if (item.type === 'text' && item.node) {
-            item.node.textContent = translated;
+            item.node.textContent = finalTranslation;
           } else if (item.type === 'form' && item.element) {
             if (item.attribute === 'textContent') {
-              item.element.textContent = translated;
+              item.element.textContent = finalTranslation;
             } else {
-              item.element.setAttribute(item.attribute, translated);
+              item.element.setAttribute(item.attribute, finalTranslation);
             }
           }
         }
