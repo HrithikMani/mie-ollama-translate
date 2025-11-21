@@ -290,68 +290,80 @@
 
     </div>
 
-    <!-- Add Provider Modal -->
-    <div id="provider-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <span>Add New Provider</span>
-                <span class="modal-close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Provider Name:</label>
-                    <input type="text" placeholder="Enter provider name">
-                </div>
-                <div class="form-group">
-                    <label>Specialty:</label>
-                    <select>
-                        <option value="">Select Specialty</option>
-                        <option value="cardiology">Cardiology</option>
-                        <option value="dermatology">Dermatology</option>
-                        <option value="neurology">Neurology</option>
-                        <option value="pediatrics">Pediatrics</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>NPI Number:</label>
-                    <input type="text" placeholder="Enter NPI number">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="action-btn" id="cancel-provider">Cancel</button>
-                <button class="action-btn" style="background-color: #d9534f; color: white; border-color: #d9534f;">Save Provider</button>
-            </div>
-        </div>
-    </div>
+    <!-- Dynamic Modal Container (Empty initially) -->
+    <!-- Modal is now created via JavaScript to test MutationObserver -->
 
     <!-- Import the Translation Script -->
     <script src="../frontend/main.js"></script>
 
     <script>
-        // Modal Logic
-        const modal = document.getElementById('provider-modal');
+        // Dynamic Modal Logic
         const btn = document.getElementById('add-provider-link');
-        const closeBtn = document.querySelector('.modal-close');
-        const cancelBtn = document.getElementById('cancel-provider');
 
-        function openModal(e) {
-            e.preventDefault();
-            modal.classList.add('active');
-        }
+        function createAndShowModal() {
+            // Create modal elements dynamically
+            const modalOverlay = document.createElement('div');
+            modalOverlay.id = 'provider-modal';
+            modalOverlay.className = 'modal-overlay active'; // 'active' class makes it visible in CSS
 
-        function closeModal() {
-            modal.classList.remove('active');
-        }
+            modalOverlay.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span>Add New Provider</span>
+                        <span class="modal-close">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Provider Name:</label>
+                            <input type="text" placeholder="Enter provider name">
+                        </div>
+                        <div class="form-group">
+                            <label>Specialty:</label>
+                            <select>
+                                <option value="">Select Specialty</option>
+                                <option value="cardiology">Cardiology</option>
+                                <option value="dermatology">Dermatology</option>
+                                <option value="neurology">Neurology</option>
+                                <option value="pediatrics">Pediatrics</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>NPI Number:</label>
+                            <input type="text" placeholder="Enter NPI number">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="action-btn" id="cancel-provider">Cancel</button>
+                        <button class="action-btn" style="background-color: #d9534f; color: white; border-color: #d9534f;">Save Provider</button>
+                    </div>
+                </div>
+            `;
 
-        btn.addEventListener('click', openModal);
-        closeBtn.addEventListener('click', closeModal);
-        cancelBtn.addEventListener('click', closeModal);
+            // Append to DOM - This should trigger MutationObserver
+            document.body.appendChild(modalOverlay);
 
-        // Close modal when clicking outside
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
+            // Setup close handlers
+            const closeBtn = modalOverlay.querySelector('.modal-close');
+            const cancelBtn = modalOverlay.querySelector('#cancel-provider');
+
+            function closeModal() {
+                document.body.removeChild(modalOverlay);
             }
+
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            
+            // Close when clicking outside
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+        }
+
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            createAndShowModal();
         });
     </script>
 </body>
