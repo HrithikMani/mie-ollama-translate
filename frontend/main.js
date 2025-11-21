@@ -15,6 +15,7 @@ const CONFIG = {
   BATCH_SIZE: 50, // Process mutations in batches
   CACHE_SIZE: 1000, // Maximum cache entries
   MIN_TEXT_LENGTH: 2,
+  IGNORED_CLASSES: ['card-icon', 'material-icons', 'icon', 'fa', 'fas', 'far', 'banner-icon'],
   OBSERVE_CONFIG: {
     childList: true,
     subtree: true,
@@ -86,6 +87,10 @@ function shouldTranslateText(text) {
   
   // Check if already translated
   if (trimmed.startsWith(CONFIG.TRANSLATION_PREFIX)) return false;
+
+  // Heuristic: If it's short and has no letters, it's likely an icon, number, or symbol
+  // This handles cases like "✏️", "✖️", "123", "..."
+  if (trimmed.length < 5 && !/[a-zA-Z]/.test(trimmed)) return false;
   
   // Combined regex for efficiency
   const patterns = [
@@ -145,6 +150,11 @@ class ElementProcessor {
     
     const tagName = parent.tagName.toLowerCase();
     if (['script', 'style', 'noscript', 'iframe', 'svg'].includes(tagName)) {
+      return null;
+    }
+
+    // Check for ignored classes
+    if (CONFIG.IGNORED_CLASSES.some(cls => parent.classList.contains(cls))) {
       return null;
     }
     
