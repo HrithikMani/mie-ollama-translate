@@ -11,6 +11,7 @@ console.log('🔍 Initializing optimized translation system...\n');
 
 const CONFIG = {
   TRANSLATION_PREFIX: '[TRANSLATION] ',
+  TARGET_LANGUAGE: 'es', // Default to Spanish
   DEBOUNCE_DELAY: 100, // ms to wait before processing mutations
   BATCH_SIZE: 50, // Process mutations in batches
   CACHE_SIZE: 1000, // Maximum cache entries
@@ -41,7 +42,8 @@ class TranslationCache {
     }
     
     const encoder = new TextEncoder();
-    const data = encoder.encode(text);
+    // Include language in hash to ensure unique hashes per language
+    const data = encoder.encode(text + '|' + CONFIG.TARGET_LANGUAGE);
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
@@ -355,7 +357,11 @@ class SocketManager {
   queueForTranslation(text, hash) {
     if (this.sentHashes.has(hash)) return;
     
-    this.sendQueue.add(JSON.stringify({ text, hash }));
+    this.sendQueue.add(JSON.stringify({ 
+      text, 
+      hash, 
+      targetLang: CONFIG.TARGET_LANGUAGE 
+    }));
     this.sentHashes.add(hash);
     
     if (this.isConnected) {
@@ -625,6 +631,18 @@ const mutationHandler = new OptimizedMutationHandler();
 // ========================================
 
 window.translationSystem = {
+  // Set target language
+  setLanguage(langCode) {
+    console.log(`🌐 Switching language to: ${langCode}`);
+    CONFIG.TARGET_LANGUAGE = langCode;
+    
+    // Clear caches to force re-hashing and re-sending
+    this.clearCache();
+    socketManager.sentHashes.clear();
+    
+    console.log(`✅ Language set to ${langCode}. New content will be hashed for ${langCode}.`);
+  },
+
   // Start the system
   async start() {
     console.log('🚀 Starting translation system...\n');

@@ -13,9 +13,10 @@ wss.on('connection', (ws) => {
       const data = JSON.parse(message);
       
       if (data.type === 'translation_request') {
-        console.log(`📥 Received batch of ${data.payload.length} items:`);
+        const targetLang = data.payload[0]?.targetLang || 'unknown';
+        console.log(`📥 Received batch of ${data.payload.length} items for language: ${targetLang}`);
         data.payload.forEach(item => {
-          console.log(`   - [${item.hash.substring(0, 8)}...] "${item.text}"`);
+          console.log(`   - [${item.hash.substring(0, 8)}...] (${item.targetLang}) "${item.text}"`);
         });
 
         // Acknowledge receipt (optional)
