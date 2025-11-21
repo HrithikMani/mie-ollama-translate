@@ -16,11 +16,17 @@ A high-performance, client-side JavaScript translation framework designed to han
 
 ## Installation
 
-Simply include the `main.js` script in your HTML file:
+Simply include the `main.js` script in your HTML file. If you are using the provided folder structure, it is located in the `frontend` directory:
 
 ```html
-<script src="main.js"></script>
+<script src="frontend/main.js"></script>
 ```
+
+## Project Structure
+
+- `frontend/`: Contains the core client-side translation script (`main.js`).
+- `backend/`: Placeholder for backend services (e.g., Ollama integration).
+- `examples/`: Contains example implementations, such as an EHR dashboard.
 
 ## Usage
 

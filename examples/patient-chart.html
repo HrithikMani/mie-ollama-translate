@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Health - Patient Chart</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="chart-page">
+
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-left">
+            <a href="ehr-dashboard.html" style="text-decoration: none; color: inherit;"><span style="font-size: 16px;">🏠</span></a>
+            <a href="ehr-dashboard.html" class="nav-item">Orders</a>
+            <a href="#" class="nav-item alert">Doc Queue (3)</a>
+        </div>
+        <div class="nav-right">
+            <span>👤 Konda, Hrithik Mani - SuperUser</span>
+            <span>🕒 EST</span>
+            <span>🔍</span>
+        </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+        <div class="tab active">Summary</div>
+        <div class="tab">Admin (42)</div>
+        <div class="tab">Health Surveillance</div>
+        <div class="tab">Medical Record (178)</div>
+        <div class="tab">On Screen Forms</div>
+        <div class="tab">Needs Signed (12)</div>
+        <div class="tab">Documents (283)</div>
+    </div>
+
+    <!-- Patient Banner -->
+    <div class="patient-banner">
+        <div class="banner-row">
+            <div>
+                <span style="font-size: 14px; font-weight: bold;">HART, WILLIAM S.</span>
+                <span>70 y/o M</span>
+                <span class="tag">DUPLICATE</span>
+                <span>Status: <strong>Active</strong></span>
+                <span>Tasks: <span class="tag">3</span></span>
+                <span>Open Enc: <span class="tag">7</span></span>
+            </div>
+            <div>
+                <span>TEST-10019</span>
+            </div>
+        </div>
+        <div class="banner-row">
+            <div>
+                <span class="info-label">Date of birth:</span> 11-30-1954
+                <span class="info-label">Email:</span> dcornewell@mieweb.com
+                <span class="info-label">Employer:</span> Better Corp.
+                <span class="info-label">Attending:</span> Selenium Selenium
+            </div>
+        </div>
+        <div class="banner-row red-bg">
+            <div>
+                <span class="info-label">Allergies:</span> <strong>PENICILLINS , SULFA(SULFONAMIDE ANTIBIOTICS)</strong>
+                <span class="info-label" style="margin-left: 10px;">Medications:</span> <span style="color: yellow;">Aspirin Oral, Calcium, Coumadin, Ibuprofen oral, Lasix oral, Lisinopril</span>
+            </div>
+        </div>
+        <div class="banner-row" style="background-color: #cc3333; margin-top: 0;">
+             <div>
+                <span class="info-label">Comments:</span> Do not release info to siblings.
+             </div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        
+        <!-- Left Column -->
+        <div class="col-left">
+            <!-- Demographics -->
+            <div class="portlet">
+                <div class="portlet-header">
+                    <span>📋 Demographics</span>
+                    <div class="icons"><span>✏️</span><span>✖️</span></div>
+                </div>
+                <div class="portlet-content demographics-grid">
+                    <div>
+                        <strong>Hart, William S.</strong><br>
+                        2300 Commonwealth Avenue<br>
+                        Fort Wayne, IN 46804<br>
+                        Home #: <strong>(260) 444-0099</strong><br>
+                        Mobile #: <strong>(260) 437-0001</strong><br>
+                        Email: dcornewell@mieweb.com<br>
+                        Age: <strong>70</strong>, Birthdate: <strong>11-30-1954</strong>
+                        
+                        <div class="section-title">Employment Information:</div>
+                        <strong>Retired</strong><br>
+                        Employee Status: <strong>Active</strong><br>
+                        Company Code: <strong>Corporate Office</strong>
+
+                        <div class="section-title">Emergency Contact:</div>
+                        <strong>Doug Hart</strong><br>
+                        Phone #1: <strong>(260) 444-0055</strong>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="photo-box">
+                            <!-- Random patient photo -->
+                            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Patient Photo">
+                        </div>
+                        <a href="#" style="font-size: 10px;">Update Photo</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contacts -->
+            <div class="portlet">
+                <div class="portlet-header">
+                    <span>👥 Contacts</span>
+                    <div class="icons"><span>✏️</span><span>✖️</span></div>
+                </div>
+                <div class="portlet-content">
+                    <ul class="simple-list">
+                        <li>Attending Physician: <a href="#">Selenium, Selenium</a></li>
+                        <li>Family Medicine: <a href="#">Sample, John M.</a></li>
+                        <li>Employer: <a href="#">Better Corp.</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Appointments -->
+            <div class="portlet">
+                <div class="portlet-header">
+                    <span>📅 Appointments</span>
+                    <div class="icons"><span>✏️</span><span>✖️</span></div>
+                </div>
+                <div class="portlet-content">
+                    <ul class="simple-list">
+                        <li>None</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Column -->
+        <div class="col-mid">
+            <!-- Panel Membership -->
+            <div class="portlet">
+                <div class="portlet-header">
+                    <span>⚕️ Panel Membership</span>
+                    <div class="icons"><span>✏️</span><span>✖️</span></div>
+                </div>
+                <div class="portlet-content">
+                    <ul class="simple-list">
+                        <li>No Panel Memberships</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Due List -->
+            <div class="portlet">
+                <div class="portlet-header">
+                    <span>⏰ Due List</span>
+                    <div class="icons"><span>✏️</span><span>✖️</span></div>
+                </div>
+                <div class="portlet-content">
+                    <div class="section-title">Health Surveillance</div>
+                    <div class="checkbox-list">
+                        <div><input type="checkbox"> Influenza Injection <span style="float:right;">⚡</span></div>
+                    </div>
+
+                    <div class="section-title">Imaging</div>
+                    <div class="checkbox-list">
+                        <div><input type="checkbox"> Xray Knee (specify Left/Right): <span style="float:right;">⚡</span></div>
+                        <div><input type="checkbox"> Xray Shoulder (specify Left/Right): <span style="float:right;">⚡</span></div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 10px;">
+                        <button class="action-btn">Requisition Orders</button>
+                        <button class="action-btn">Perform Orders</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Due List -->
+            <div class="portlet">
+                <div class="portlet-header">
+                    <span>📅 Today's Due List</span>
+                    <div class="icons"><span>✏️</span><span>✖️</span></div>
+                </div>
+                <div class="portlet-content" style="text-align: center; color: #666;">
+                    No pending orders found.
+                </div>
+            </div>
+
+            <!-- Order Quick Links -->
+            <div class="portlet">
+                <div class="portlet-header">
+                    <span>⚡ Order Quick Links</span>
+                    <div class="icons"><span>✏️</span><span>✖️</span></div>
+                </div>
+                <div class="portlet-content checkbox-list">
+                    <div><input type="checkbox"> Audiogram <span style="float:right;">⚡</span></div>
+                    <div><input type="checkbox"> ECG <span style="float:right;">⚡</span></div>
+                    <div><input type="checkbox"> Influenza Injection <span style="float:right;">⚡</span></div>
+                    <div><input type="checkbox"> Respirator Fit <span style="float:right;">⚡</span></div>
+                    <div><input type="checkbox"> Spirometry <span style="float:right;">⚡</span></div>
+                    <div><input type="checkbox"> TB Skin Test (Mantoux/PPD) <span style="float:right;">⚡</span></div>
+                    <div><input type="checkbox"> Vision Screening <span style="float:right;">⚡</span></div>
+                    <div><input type="checkbox"> Follow up <span style="float:right;">⚡</span></div>
+                    
+                    <div style="text-align: center; margin-top: 10px;">
+                        <button class="action-btn">Perform Selected Orders</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-right">
+            <!-- Quick Links -->
+            <div class="portlet">
+                <div class="portlet-header">
+                    <span>🔗 Quick Links</span>
+                    <div class="icons"><span>✏️</span><span>✖️</span></div>
+                </div>
+                <div class="portlet-content link-list">
+                    <a href="#">• Add New Provider</a>
+                    <a href="#">• Add Appt</a>
+                    <a href="#">• Add Task</a>
+                    <a href="#">• Email</a>
+                    <a href="#">• Checkin</a>
+                    <a href="#">• Prescribe</a>
+                    <a href="#">• Print Chart</a>
+                </div>
+            </div>
+
+            <!-- Open Encounters -->
+            <div class="portlet">
+                <div class="portlet-header">
+                    <span>📂 Open Encounters</span>
+                    <div class="icons"><span>✏️</span><span>✖️</span></div>
+                </div>
+                <div class="portlet-content">
+                    <div style="font-size: 10px; margin-bottom: 5px;">Open Encounters, 7 records</div>
+                    <div class="table-row">
+                        <input type="checkbox">
+                        <span>Driver Fitness</span>
+                        <span>10-02-2018</span>
+                    </div>
+                    <div class="table-row">
+                        <input type="checkbox">
+                        <span>Visit</span>
+                        <span>12-05-2022</span>
+                    </div>
+                    <div class="table-row">
+                        <input type="checkbox">
+                        <span>Exam</span>
+                        <span>02-04-2025</span>
+                    </div>
+                    <div class="table-row">
+                        <input type="checkbox">
+                        <span>Current (Release)</span>
+                        <span>11-21-2025</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Import the Translation Script -->
+    <script src="../frontend/main.js"></script>
+</body>
+</html>

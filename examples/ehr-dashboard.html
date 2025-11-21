@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Health - EHR Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dashboard-page">
+
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="nav-left">
+            <span style="font-size: 16px;">🏠</span>
+            <a href="#" class="nav-item">Orders</a>
+            <a href="#" class="nav-item alert">Doc Queue (3)</a>
+        </div>
+        <div class="nav-right">
+            <span>👤 Konda, Hrithik Mani - SuperUser</span>
+            <span>🕒 EST</span>
+            <span>🔍</span>
+        </div>
+    </div>
+
+    <!-- Banner -->
+    <div class="dashboard-banner">
+        <div>
+            <span class="banner-icon"></span>
+            Administrator Welcome
+        </div>
+        <span>^</span>
+    </div>
+
+    <div class="container">
+        <!-- Dashboard Cards -->
+        <div class="dashboard-grid">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="card-icon">🩺</div>
+                <h3>Sample patient demo</h3>
+                <p>Take our <strong>sample patient</strong> demo for a test run before you get started.</p>
+                <button class="btn" onclick="window.location.href='patient-chart.html'">TRY IT!</button>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="card-icon">💳</div>
+                <h3>Enterprise Health Store</h3>
+                <p>Setup your billing information for Enterprise Health in the Enterprise Health store.</p>
+                <button class="btn">SETUP BILLING</button>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="card-icon">▶️</div>
+                <h3>Documentation/videos</h3>
+                <p>New to Enterprise Health? Check out our <strong>workflows</strong> and <strong>video demo library</strong>.</p>
+                <button class="btn">WATCH</button>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="card">
+                <div class="card-icon">➡️</div>
+                <h3>Getting started</h3>
+                <p>Learn more about these features:</p>
+                <ul class="feature-list">
+                    <li>Artificial Intelligence</li>
+                    <li>Lab Interfaces</li>
+                    <li>Portals</li>
+                    <li>EPCS Certificates</li>
+                    <li>IMO for Condition Search</li>
+                    <li>Import Patients</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bottom Sections -->
+        <div class="bottom-section">
+            <!-- Latest News -->
+            <div class="section-box">
+                <div class="section-header">Latest news</div>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">News, information, and events from Enterprise Health...</p>
+
+                <div class="news-item">
+                    <div class="news-img" style="background-color: #aaddff;"></div>
+                    <div class="news-content">
+                        <h4>Clinical documentation: from click-heavy chaos to streamlined bliss</h4>
+                        <a href="#">read more</a>
+                    </div>
+                </div>
+
+                <div class="news-item">
+                    <div class="news-img" style="background-color: #ffddaa;"></div>
+                    <div class="news-content">
+                        <h4>Is your OEHR designed around the way occ health teams actually work?</h4>
+                        <a href="#">read more</a>
+                    </div>
+                </div>
+
+                <div class="news-item">
+                    <div class="news-img" style="background-color: #aaffaa;"></div>
+                    <div class="news-content">
+                        <h4>Why R&D commitment actually matters in occ health software</h4>
+                        <a href="#">read more</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Latest Apps -->
+            <div class="section-box">
+                <div class="section-header">Latest Apps</div>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">See the latest apps available in the Enterprise Health store.</p>
+                
+                <div class="news-item">
+                    <div class="news-img" style="background-color: #ffaaaa;"></div>
+                    <div class="news-content">
+                        <h4>Enterprise Health TeleHealth™</h4>
+                        <p style="font-size: 12px; margin: 5px 0;">A low-cost simple way for providers to connect with patients without having to install any software.</p>
+                        <a href="#">learn more</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dynamic Content Test Area -->
+        <div id="dynamic-content-area">
+            <h3>Dynamic Content Test</h3>
+            <p>Click the button below to simulate loading new patient data (tests MutationObserver).</p>
+            <button id="load-more-btn" class="btn">Load Patient Data</button>
+            <div id="patient-data-container" style="margin-top: 15px;"></div>
+        </div>
+
+    </div>
+
+    <!-- Portals Footer -->
+    <div class="portals-bar">
+        <span>Portals</span>
+        <div>
+            <span>^</span> <span>x</span> <span>+</span>
+        </div>
+    </div>
+    <div class="portals-content">
+        You do not have access to any portals.
+    </div>
+
+    <!-- Import the Translation Script -->
+    <script src="../frontend/main.js"></script>
+
+    <!-- Script to simulate dynamic content for testing -->
+    <script>
+        document.getElementById('load-more-btn').addEventListener('click', () => {
+            const container = document.getElementById('patient-data-container');
+            
+            const newContent = document.createElement('div');
+            newContent.innerHTML = `
+                <div style="border: 1px solid #ddd; padding: 10px; margin-top: 10px; background: #f9f9f9;">
+                    <h4>Patient: Doe, John</h4>
+                    <p><strong>DOB:</strong> 01-01-1980</p>
+                    <p><strong>Status:</strong> Active</p>
+                    <p><strong>Allergies:</strong> Penicillin, Peanuts</p>
+                    <input type="text" placeholder="Enter notes here..." style="width: 100%; padding: 5px; margin-top: 5px;">
+                </div>
+            `;
+            
+            container.appendChild(newContent);
+        });
+    </script>
+</body>
+</html>
