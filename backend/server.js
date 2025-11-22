@@ -1,12 +1,17 @@
 const WebSocket = require('ws');
 const async = require('async');
 const https = require('https');
+const http = require('http');
 const { createCache } = require('cache-manager');
 require('dotenv').config();
 
 const PORT = 8080;
 const wss = new WebSocket.Server({ port: PORT });
 const API_KEY = process.env.AI_API_KEY;
+
+// Configuration
+const TRANSLATION_PROVIDER = process.env.TRANSLATION_PROVIDER || 'bluehive'; // 'bluehive' or 'ollama'
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3';
 
 // Initialize cache
 const memoryCache = createCache();
@@ -57,6 +62,10 @@ const translationQueue = async.queue(async (task) => {
 }, 5); // Concurrency of 5
 
 async function translateText(text, targetLang) {
+  if (TRANSLATION_PROVIDER === 'ollama') {
+    return translateWithOllama(text, targetLang);
+  }
+
   const API_KEY = process.env.BLUEHIVE_API_KEY || process.env.AI_API_KEY;
   
   console.log(`🤖 Calling Ozwell AI API...`);
@@ -118,6 +127,65 @@ Return ONLY the most natural and contextually appropriate translation, with no a
 
     req.on('error', (error) => {
       reject(error);
+    });
+
+    req.write(data);
+    req.end();
+  });
+}
+
+async function translateWithOllama(text, targetLang) {
+  console.log(`🦙 Calling Ollama (${OLLAMA_MODEL})...`);
+
+  const data = JSON.stringify({
+    model: OLLAMA_MODEL,
+    prompt: `Translate the following text to ${targetLang} language code.
+    
+    Text: "${text}"
+    
+    Instructions:
+    - Use terminology that is widely recognized and used by healthcare professionals and patients.
+    - Return ONLY the translation, no intro or outro.`,
+    stream: false
+  });
+
+  const options = {
+    hostname: 'localhost',
+    port: 11434,
+    path: '/api/generate',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(data)
+    }
+  };
+
+  return new Promise((resolve, reject) => {
+    const req = http.request(options, (res) => {
+      let responseData = '';
+
+      res.on('data', (chunk) => {
+        responseData += chunk;
+      });
+
+      res.on('end', () => {
+        if (res.statusCode !== 200) {
+          reject(new Error(`Ollama API error: ${res.statusCode}\n${responseData}`));
+        } else {
+          try {
+            const jsonData = JSON.parse(responseData);
+            const translation = jsonData.response?.trim() || text;
+            resolve(translation);
+          } catch (e) {
+            reject(new Error(`Failed to parse Ollama response: ${e.message}\n${responseData}`));
+          }
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      console.error('Ollama Connection Error:', error.message);
+      reject(new Error('Failed to connect to Ollama. Is it running on port 11434?'));
     });
 
     req.write(data);
